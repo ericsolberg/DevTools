@@ -1,0 +1,327 @@
+#!/bin/bash
+
+PromptYN() {
+  local resp
+  while true; do
+    read -p "$1" resp
+    [ -z "$resp" ] && resp="$2"
+    [[ "$resp" =~ ^[yY] ]] && return 0
+    [[ "$resp" =~ ^[nN] ]] && return 1
+  done
+}
+
+die() {
+  echo "$1" 1>&2
+  exit -1
+}
+
+clear; cat <<EOL
+
+------------------
+  DevTools Setup
+------------------
+
+DevTools uses Docker container technology to create
+a consistent, repeatable development environment that
+you can run on any laptop, desktop or cloud environment.
+With one simple command, you can set up a perfectly
+configured development environment with all of your
+favorite tools, scripts and projects. Everyone on
+your team can share the same environment, but taylor it
+to their needs. The environment can be removed from a
+system just as easily- and then recreated wherever you
+want without losing anything. The only requirement on the
+target system is the Docker runtime needed to run your
+system. This will include the Docker client, docker-machine
+utility and Boot2Docker on Mac and Windows systems.
+
+EOL
+read -p "Press Enter to continue, or Ctrl-C to quit > "
+
+# Check if docker-machine installed
+echo
+echo "Checking for local docker-machine installation"
+loc=$(which docker-machine)
+if [ -z "$loc" ]
+  then
+  echo "Not found: docker-machine"
+  loc=/usr/local/bin/docker-machine
+else
+  # Check the version string >= version 0.2
+  if [[ "$(docker-machine -v)" =~ version\ ([0-9]+)\.([0-9]+) ]]
+    then
+    v1=${BASH_REMATCH[1]}; v2=${BASH_REMATCH[2]}
+    if (( $v1 > 0 || ( $v1 == 0 && $v2 >= 2 )  ))
+      then
+      echo "Detected: docker-machine version ${v1}.${v2} in $(dirname "$loc")"
+      unset loc
+    else
+      # Previous version
+      echo "Detected: docker-machine version ${v1}.${v2} in $(dirname "$loc")"
+      echo "DevTools requires docker-machine 0.2 or greater"
+    fi
+  else
+    # Unknown version
+    echo "Detected: docker-machine unknown version in $(dirname "$loc")"
+    echo "DevTools requires docker-machine 0.2 or greater"
+  fi
+fi
+if [ -n "$loc" ]
+  then
+  # Install docker-machine from github
+  echo
+  echo "The next step will install docker-machine 0.2 from the docker github repository"
+  echo "The following commands will be executed:"
+  echo "  ------------------------------"
+  echo "  curl -L https://github.com/docker/machine/releases/download/v0.2.0/docker-machine_darwin-amd64 \\"
+  echo "  >  $loc"
+  echo "  chmod +x $loc"
+  echo "  ------------------------------"
+  if $(PromptYN "Continue? (Y/n) > " "Y")
+    then
+    curl -L https://github.com/docker/machine/releases/download/v0.2.0/docker-machine_darwin-amd64 > "$loc" \
+      || die "Command failed"
+    if [ ! -s "$loc" ]
+      then
+      die "Download of docker-machine failed"
+    fi
+    chmod +x "$loc" || die "Command failed"
+    # Verify installation
+    loc=$(which docker-machine)
+    if [ -z "$loc" ]
+      then
+      die "Installation of docker-machine failed: executable not found"
+    else
+      if [[ "$(docker-machine -v)" =~ version\ ([0-9]+)\.([0-9]+) ]]
+        then
+        v1=${BASH_REMATCH[1]}; v2=${BASH_REMATCH[2]}
+        if (( $v1 == 0 && $v2 == 2 ))
+          then
+          echo "Installed: docker-machine version ${v1}.${v2} in $(dirname "$loc")"
+        else
+          die "Installation of docker-machine failed: incorrect version"
+        fi
+      else
+        die "Installation of docker-machine failed: unknown version"
+      fi
+    fi
+  else
+    die "Aborting installation"
+  fi
+fi
+
+# Check if docker installed
+echo
+echo "Checking for local docker installation"
+loc=$(which docker)
+if [ -z "$loc" ]
+  then
+  echo "Not found: docker"
+  loc=/usr/local/bin/docker
+else
+  # Check the version string >= version 0.2
+  if [[ "$(docker -v)" =~ version\ ([0-9]+)\.([0-9]+) ]]
+    then
+    v1=${BASH_REMATCH[1]}; v2=${BASH_REMATCH[2]}
+    if (( $v1 > 1 || ( $v1 == 1 && $v2 >= 6 )  ))
+      then
+      echo "Detected: docker version ${v1}.${v2} in $(dirname "$loc")"
+      unset loc
+    else
+      # Previous version
+      echo "Detected: docker version ${v1}.${v2} in $(dirname "$loc")"
+      echo "DevTools requires docker 1.6 or greater"
+    fi
+  else
+    # Unknown version
+    echo "Detected: docker unknown version in $(dirname "$loc")"
+    echo "DevTools requires docker 1.6 or greater"
+  fi
+fi
+if [ -n "$loc" ]
+  then
+  # Install docker-machine from github
+  echo
+  echo "The next step will install docker 1.6 from docker.com"
+  echo "The following commands will be executed:"
+  echo "  ------------------------------"
+  echo "  curl -L https://get.docker.com/builds/Darwin/x86_64/docker-latest \\"
+  echo "  > $loc"
+  echo "  chmod +x $loc"
+  echo "  ------------------------------"
+  if $(PromptYN "Continue? (Y/n) > " "Y")
+    then
+    curl -L https://get.docker.com/builds/Darwin/x86_64/docker-latest > "$loc" \
+      || die "Command failed"
+    if [ ! -s "$loc" ]
+      then
+      die "Download of docker failed"
+    fi
+    chmod +x "$loc" || die "Command failed"
+    # Verify installation
+    loc=$(which docker)
+    if [ -z "$loc" ]
+      then
+      die "Installation of docker failed: executable not found"
+    else
+      if [[ "$(docker -v)" =~ version\ ([0-9]+)\.([0-9]+) ]]
+        then
+        v1=${BASH_REMATCH[1]}; v2=${BASH_REMATCH[2]}
+        if (( $v1 == 1 && $v2 == 6 ))
+          then
+          echo "Installed: docker version ${v1}.${v2} in $(dirname "$loc")"
+        else
+          die "Installation of docker failed: incorrect version"
+        fi
+      else
+        die "Installation of docker failed: unknown version"
+      fi
+    fi
+  else
+    die "Aborting installation"
+  fi
+fi
+
+# Check if VirtualBox is installed
+echo
+echo "Checking for local VirtualBox installation"
+loc=$(which VirtualBox)
+if [ -z "$loc" ]
+  then
+  echo "Not found: VirtualBox"
+  loc=/usr/bin/VirtualBox
+else
+  # Check the version string >= version 4.3.26
+  if [[ "$(VirtualBox -?)" =~ ([0-9]+)\.([0-9]+)\.([0-9]+) ]]
+    then
+    v1=${BASH_REMATCH[1]}; v2=${BASH_REMATCH[2]}; v3=${BASH_REMATCH[3]}
+    if (( $v1 > 4 || ( $v1 == 4 && $v2 > 3 ) || ( $v1 == 4 && $v2 == 3 && $v3>=26 )  ))
+      then
+      echo "Detected: VirtualBox version ${v1}.${v2}.${v3} in $(dirname "$loc")"
+      unset loc
+    else
+      # Previous version
+      echo "Detected: VirtualBox version ${v1}.${v2}.${v3} in $(dirname "$loc")"
+      echo "DevTools requires VirtualBox 4.3.26 or greater"
+    fi
+  else
+    # Unknown version
+    echo "Detected: VirtualBox unknown version in $(dirname "$loc")"
+    echo "DevTools requires VirtualBox 4.3.26 or greater"
+  fi
+fi
+if [ -n "$loc" ]
+  then
+  # Install docker-machine from github
+  echo
+  echo "The next step will install VirtualBox 4.3.26 from virtualbox.org"
+  echo "The following commands will be executed:"
+  echo "  ------------------------------"
+  echo "  curl -L http://download.virtualbox.org/virtualbox/4.3.26/VirtualBox-4.3.26-98988-OSX.dmg \\"
+  echo "  > ~/Downloads/VirtualBox-4.3.26-98988-OSX.dmg"
+  echo "  hdiutil mount -quiet ~/Downloads/VirtualBox-4.3.26-98988-OSX.dmg"
+  echo "  sudo installer -package /Volumes/VirtualBox/VirtualBox.pkg -target \"/Volumes/Macintosh HD\""
+  echo "  hdiutil unmount -quiet /Volumes/VirtualBox"
+  echo "  ------------------------------"
+  if $(PromptYN "Continue? (Y/n) > " "Y")
+    then
+    curl -L http://download.virtualbox.org/virtualbox/4.3.26/VirtualBox-4.3.26-98988-OSX.dmg \
+      > ~/Downloads/VirtualBox-4.3.26-98988-OSX.dmg || die "Command failed"
+    hdiutil mount -quiet ~/Downloads/VirtualBox-4.3.26-98988-OSX.dmg || die "Command failed"
+    sudo installer -package /Volumes/VirtualBox/VirtualBox.pkg -target "/Volumes/Macintosh HD" \
+      || die "Command failed"
+    hdiutil unmount -quiet /Volumes/VirtualBox || die "Command failed"
+    # Verify installation
+    loc=$(which VirtualBox)
+    if [ -z "$loc" ]
+      then
+      die "Installation of VirtualBox failed: executable not found"
+    else
+      # Check the version string >= version 4.3.26
+      if [[ "$(VirtualBox -?)" =~ ([0-9]+)\.([0-9]+)\.([0-9]+) ]]
+        then
+        v1=${BASH_REMATCH[1]}; v2=${BASH_REMATCH[2]}; v3=${BASH_REMATCH[3]}
+        if (( $v1 == 4 && $v2 == 3 && $v3 == 26 ))
+          then
+          echo "Installed: VirtualBox version ${v1}.${v2}.${v3} in $(dirname "$loc")"
+        else
+          die "Installation of VirtualBox failed: incorrect version"
+        fi
+      else
+        die "Installation of VirtualBox failed: unknown version"
+      fi
+    fi
+  else
+    die "Aborting installation"
+  fi
+fi
+
+# Create the DevTools virtual machine
+echo
+echo "Ready to set up DockerTools VM"
+test="$(docker-machine ls | grep devtools)"
+if [ -n "$test" ]
+  then
+  echo
+  echo "Note: A VM named devtools already exists"
+  echo "Do you want to use the existing devtools VM?"
+  echo "Enter Y to use the existing VM"
+  echo "Enter N to delete the VM and create a new one."
+  if PromptYN "Use existing VM? (y/N) > " "N"
+    then
+    echo "Using existing devtools VM"
+  else
+    echo "Removing existing devtools VM"
+    docker-machine rm devtools || die "Command error"
+  fi
+fi
+test="$(docker-machine ls | grep devtools)"
+if [ -z "$test" ]
+  then
+  echo "Creating devtools VM"
+  docker-machine create --driver virtualbox devtools || die "Command error"
+  test="$(docker-machine ls | grep devtools)"
+  if [ -n "$test" ]
+    then
+    echo
+    echo "DevTools VM is ready."
+  else
+    die "VM creation failed."
+  fi
+fi
+echo "Setting DevTools docker environment"
+docker-machine active devtools || die "Command error"
+eval "$(docker-machine env devtools)" || die "Command error"
+#export DOCKER_HOST=$DOCKER_HOST
+#export DOCKER_TLS_VERIFY
+#export DOCKER_CERT_PATH
+
+#   No - Go to Docker install
+# Check if Docker >= 1.6 installed
+#   No - Go to Docker update
+# Check if Dockermachine 0.2 installed
+#   No - Go to Docker Machine install
+# Branch DevTools in GIT or use existing branch
+# Gather Git user name & Passworword
+# Verify Create Branch
+#   No - cancel
+# Create branch
+# Get dev volume path
+# Set DEVTOOLS_HOME
+# Create start script
+# Build DevTools container
+# Run start script - first run will install DevTools
+
+
+
+
+#cat >> $DEV_HOME/start <<-"EOL"
+#  #!/bin/bash
+#  echo $DEV_HOME
+#"EOL"
+
+#export PATH=$PATH:$DEV_HOME/bin
+
+#devtools info
+
+#devtools menu
