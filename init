@@ -53,7 +53,7 @@ echo "Enter the base project directory on the local computer."
 echo "When working locally, this directory will be shared"
 echo "between the local system and your DevTools environment"
 while [ -z "$DEV_HOME" ]; do
-  PromptString "\nEnter DEV_HOME\n(Default $(pwd)) > " "$(pwd)"
+  PromptString "\nEnter DEV_HOME\n(Default ${HOME}/devhome) > " "${HOME}/devhome"
   cpath="$resp"
   if [[ $cpath =~ ^\~(.*) ]]; then
     cpath="${HOME}${BASH_REMATCH[1]}"
@@ -116,31 +116,29 @@ done
 [ -d "$DEV_HOME" ] || die "Failed to create $DEVTOOLS_HOME"
 cd "$DEV_HOME" || die "Command failed"
 export DEV_HOME
-export DEVTOOLS_HOME="$DEV_HOME/devtools"
-export DEVTOOLS_BIN="$DEVTOOLS_HOME/bin"
-export DEVTOOLS_LIB="$DEVTOOLS_HOME/lib"
+export DEVTOOLS="$DEV_HOME/devtools"
 
 # setup DevTools bin & lib
-if [ ! -d "$DEVTOOLS_BIN" ]; then
-  echo "Creating $DEVTOOLS_BIN"
-  mkdir -p "$DEVTOOLS_BIN" || die "Command failed"
+if [ ! -d "$DEVTOOLS/bin" ]; then
+  echo "Creating $DEVTOOLS/bin"
+  mkdir -p "$DEVTOOLS/bin" || die "Command failed"
 fi
-if [ ! -d "$DEVTOOLS_LIB" ]; then
-  echo "Creating $DEVTOOLS_LIB"
-  mkdir -p "$DEVTOOLS_LIB" || die "Command failed"
+if [ ! -d "$DEVTOOLS/lib" ]; then
+  echo "Creating $DEVTOOLS/lib"
+  mkdir -p "$DEVTOOLS/lib" || die "Command failed"
 fi
 
 echo "Checking for local Node 0.12.2"
-if [ -d "$DEVTOOLS_LIB/node-v0.12.2-darwin-x64" ] && [ -f "$DEVTOOLS_LIB/node-v0.12.2-darwin-x64/bin/node" ]
+if [ -d "$DEVTOOLS/lib/node-v0.12.2-darwin-x64" ] && [ -f "$DEVTOOLS/lib/node-v0.12.2-darwin-x64/bin/node" ]
   then
-  echo "Detected: Node 0.12.2 in $DEVTOOLS_LIB/node-v0.12.2-darwin-x64"
+  echo "Detected: Node 0.12.2 in $DEVTOOLS/lib/node-v0.12.2-darwin-x64"
 else
   echo "Downloading and extracting local Node 0.12.2"
-  cd "$DEVTOOLS_LIB" || die "Command failed"
+  cd "$DEVTOOLS/lib" || die "Command failed"
   curl -L http://nodejs.org/dist/v0.12.2/node-v0.12.2-darwin-x64.tar.gz | gunzip | tar -x
 fi
-export DEVTOOLS_NODE="$DEVTOOLS_LIB/node-v0.12.2-darwin-x64/bin/node"
-export DEVTOOLS_NPM="$DEVTOOLS_LIB/node-v0.12.2-darwin-x64/bin/npm"
+export DEVTOOLS_NODE="$DEVTOOLS/lib/node-v0.12.2-darwin-x64/bin/node"
+export DEVTOOLS_NPM="$DEVTOOLS/lib/node-v0.12.2-darwin-x64/bin/npm"
 cd "$DEV_HOME" || die "Command failed"
 
 # Check if docker-machine installed
@@ -182,8 +180,10 @@ if [ -n "$loc" ]
   echo "  >  $loc"
   echo "  chmod +x $loc"
   echo "  ------------------------------"
+  ehcho "you are here"
   if $(PromptYN "Continue? (Y/n) > " "Y")
     then
+    echo "Now you are here"
     curl -L https://github.com/docker/machine/releases/download/v0.2.0/docker-machine_darwin-amd64 > "$loc" \
       || die "Command failed"
     if [ ! -s "$loc" ]
