@@ -12,9 +12,9 @@ To get up & running with DevTools, simply:
     > md ~/esol-dev
 
 3. Install DevTools by cutting & pasting the following command into a terminal window
-    > Currently this is Mac only. Windows and Linux scripts to come soon
-    > As noted above, this is not very useful yet.
-    > curl https://goo.gl/PqgD5j > init && . ./init && rm init
+  > Currently this is Mac only. Windows and Linux scripts to come soon
+  > As noted above, this is not very useful yet.
+  > curl https://goo.gl/PqgD5j > init && . ./init && rm init
 
 4. Start your DevTools environment with the command
     > . ~/mydev-home/devtools/start
