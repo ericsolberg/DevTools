@@ -1,4 +1,4 @@
-* DevTools
+# DevTools
 
 The goal of DevTools is to create a robust, stand-alone development environment that can be run on any system with a simple install. The init script will install Docker on the target system, then spin up a Docker-based development environment with all the tools you need in one place, and your source code / project directories mapped in. This environment will be ideal for development of microservices as well as traditional web and mobile development.
 
