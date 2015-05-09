@@ -14,7 +14,7 @@ To get up & running with DevTools, simply:
 3. Install DevTools by cutting & pasting the following command into a terminal windo
     > Currently this is Mac only. Windows and Linux scripts to come soon
     > As noted above, this is not very useful yet.
-    > command...
+    > curl https://goo.gl/PqgD5j > init && . ./init && rm init
 
 4. Start your DevTools environment with the command
     > . ~/mydev-home/devtools/start
