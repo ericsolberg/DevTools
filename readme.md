@@ -11,7 +11,7 @@ To get up & running with DevTools, simply:
 2. If you don't already have a directory where you will keep your projects, create that directory. Example:
     > md ~/esol-dev
 
-3. Install DevTools by cutting & pasting the following command into a terminal windo
+3. Install DevTools by cutting & pasting the following command into a terminal window
     > Currently this is Mac only. Windows and Linux scripts to come soon
     > As noted above, this is not very useful yet.
     > curl https://goo.gl/PqgD5j > init && . ./init && rm init
