@@ -16,7 +16,7 @@ To get up & running with DevTools, simply:
     > Currently this is Mac only. Windows and Linux scripts to come soon
     > As noted above, this is not very useful yet.
 
-        curl https://goo.gl/PqgD5j > init && . ./init && rm init
+        curl -sSL https://goo.gl/PqgD5j > init && . ./init && rm init
 
 5. Start your DevTools environment with the command
         . ~/mydev-home/devtools/start
