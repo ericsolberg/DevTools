@@ -180,8 +180,7 @@ if [ -n "$loc" ]
   echo "  >  $loc"
   echo "  chmod +x $loc"
   echo "  ------------------------------"
-  ehcho "you are here"
-  if $(PromptYN "Continue? (Y/n) > " "Y")
+  if PromptYN "Continue? (Y/n) > " "Y"
     then
     echo "Now you are here"
     curl -L https://github.com/docker/machine/releases/download/v0.2.0/docker-machine_darwin-amd64 > "$loc" \
@@ -254,7 +253,7 @@ if [ -n "$loc" ]
   echo "  > $loc"
   echo "  chmod +x $loc"
   echo "  ------------------------------"
-  if $(PromptYN "Continue? (Y/n) > " "Y")
+  if PromptYN "Continue? (Y/n) > " "Y"
     then
     curl -L https://get.docker.com/builds/Darwin/x86_64/docker-latest > "$loc" \
       || die "Command failed"
@@ -328,7 +327,7 @@ if [ -n "$loc" ]
   echo "  sudo installer -package /Volumes/VirtualBox/VirtualBox.pkg -target \"/Volumes/Macintosh HD\""
   echo "  hdiutil unmount -quiet /Volumes/VirtualBox"
   echo "  ------------------------------"
-  if $(PromptYN "Continue? (Y/n) > " "Y")
+  if PromptYN "Continue? (Y/n) > " "Y"
     then
     curl -L http://download.virtualbox.org/virtualbox/4.3.26/VirtualBox-4.3.26-98988-OSX.dmg \
       > ~/Downloads/VirtualBox-4.3.26-98988-OSX.dmg || die "Command failed"
