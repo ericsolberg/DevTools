@@ -182,7 +182,6 @@ if [ -n "$loc" ]
   echo "  ------------------------------"
   if PromptYN "Continue? (Y/n) > " "Y"
     then
-    echo "Now you are here"
     curl -L https://github.com/docker/machine/releases/download/v0.2.0/docker-machine_darwin-amd64 > "$loc" \
       || die "Command failed"
     if [ ! -s "$loc" ]
